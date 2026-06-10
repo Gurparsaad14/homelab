@@ -25,18 +25,16 @@ The goals for this project were:
 
 ## Hardware
 
-### Dell OptiPlex
+### Dell OptiPlex 7070 SFF
 
 Specifications:
 
-* Intel Core i7
+* Intel Core i7 (9th Generation)
 * 16GB RAM
 * 512GB SSD
 * Gigabit Ethernet
 
 The OptiPlex was chosen because it provides significantly more resources than a Raspberry Pi while remaining affordable and power efficient.
-
-![Dell OptiPlex](../images/optiplex.jpg)
 
 ---
 
@@ -44,45 +42,13 @@ The OptiPlex was chosen because it provides significantly more resources than a 
 
 The first step was creating a bootable USB drive and installing Proxmox VE onto the OptiPlex.
 
-![Proxmox Installer](../images/proxmox-installer.jpg)
-
-### Initial Challenge
-
-During installation, Proxmox was unable to detect the SSD.
-
-The installer reported:
-
-```text
-no harddisks found
-```
-
-After investigating the BIOS settings, I discovered the storage controller was configured in RAID mode.
-
-Changing the BIOS setting from:
-
-```text
-RAID On
-```
-
-to:
-
-```text
-AHCI
-```
-
-resolved the issue immediately.
-
-![AHCI BIOS Configuration](../images/bios-ahci.png)
-
-This was my first exposure to how BIOS storage modes affect Linux installations.
+Once installation was complete, the server was accessible through the Proxmox web interface.
 
 ---
 
 ## Networking Challenges
 
-After installation, Proxmox booted successfully but was unreachable from other devices on the network.
-
-Troubleshooting revealed several issues:
+After installation, Proxmox booted successfully but was initially unreachable from other devices on the network.
 
 ### Incorrect Subnet
 
@@ -110,8 +76,6 @@ and updating the address to:
 192.168.1.20/24
 ```
 
----
-
 ### DNS Resolution Failure
 
 Although the Proxmox host could reach the router, it could not resolve domain names.
@@ -122,8 +86,6 @@ Attempting to download Ubuntu templates resulted in:
 Temporary failure in name resolution
 ```
 
-Further investigation showed DNS was configured to an invalid address.
-
 After correcting the DNS configuration, internet connectivity and template downloads worked correctly.
 
 This troubleshooting process helped me better understand the difference between:
@@ -131,6 +93,14 @@ This troubleshooting process helped me better understand the difference between:
 * Network connectivity
 * Routing
 * DNS resolution
+
+---
+
+## Downloading an Ubuntu Template
+
+After networking was fixed, I downloaded the Ubuntu 24.04 LXC template from the Proxmox repository.
+
+![Ubuntu Template Download](images/ubuntu-template-download.png)
 
 ---
 
@@ -148,7 +118,25 @@ Ubuntu 24.04
 DHCP Networking
 ```
 
-![Ubuntu Container](../images/ubuntu-lxc-console.png)
+### Container Creation
+
+![Ubuntu LXC Creation](images/ubuntu-lxc-creation.png)
+
+### Network Configuration
+
+![Ubuntu LXC Network Settings](images/ubuntu-lxc-network-settings.png)
+
+---
+
+## First Successful Container
+
+After deployment, the Ubuntu container booted successfully.
+
+![Ubuntu Container Console](images/ubuntu-lxc-console.png)
+
+The container received an IP address from the home network using DHCP.
+
+![Ubuntu Container Networking](images/ubuntu-lxc-networking.png)
 
 This was my first experience working with Linux containers and understanding how they differ from traditional virtual machines.
 
@@ -169,8 +157,6 @@ Verification:
 docker --version
 ```
 
-![Docker Installed](../images/docker-version.png)
-
 Docker will be used to deploy and manage future self-hosted services within the homelab.
 
 ---
@@ -187,7 +173,7 @@ Current monitors include:
 * Proxmox Host
 * Router
 
-![Uptime Kuma Dashboard](../images/uptime-kuma-dashboard.png)
+![Uptime Kuma Dashboard](images/uptime-kuma-dashboard.png)
 
 This provides immediate visibility into the health and availability of key devices within the homelab.
 
@@ -195,22 +181,7 @@ This provides immediate visibility into the health and availability of key devic
 
 ## Current Architecture
 
-![Homelab Architecture](../images/homelab-v1.png)
-
-```text
-Internet
-   │
-Router
-   │
-├── Raspberry Pi
-│   ├── AdGuard Home
-│   └── Tailscale
-│
-└── Dell OptiPlex
-    ├── Proxmox VE
-    └── Ubuntu LXC
-         └── Uptime Kuma
-```
+![Homelab Architecture](images/network-diagram-homelab-overview.png)
 
 ---
 
