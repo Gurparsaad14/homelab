@@ -100,7 +100,7 @@ This troubleshooting process helped me better understand the difference between:
 
 After networking was fixed, I downloaded the Ubuntu 24.04 LXC template from the Proxmox repository.
 
-![Ubuntu Template Download](images/ubuntu-template-download.png)
+![Ubuntu Template Download](images/proxmox/ubuntu-template-download.png)
 
 ---
 
@@ -120,11 +120,11 @@ DHCP Networking
 
 ### Container Creation
 
-![Ubuntu LXC Creation](images/ubuntu-lxc-creation.png)
+![Ubuntu LXC Creation](images/proxmox/ubuntu-lxc-creation.png)
 
 ### Network Configuration
 
-![Ubuntu LXC Network Settings](images/ubuntu-lxc-network-settings.png)
+![Ubuntu LXC Network Settings](images/proxmox/ubuntu-lxc-network-settings.png)
 
 ---
 
@@ -132,11 +132,11 @@ DHCP Networking
 
 After deployment, the Ubuntu container booted successfully.
 
-![Ubuntu Container Console](images/ubuntu-lxc-console.png)
+![Ubuntu Container Console](images/proxmox/ubuntu-lxc-console.png)
 
 The container received an IP address from the home network using DHCP.
 
-![Ubuntu Container Networking](images/ubuntu-lxc-networking.png)
+![Ubuntu Container Networking](images/proxmox/ubuntu-lxc-networking.png)
 
 This was my first experience working with Linux containers and understanding how they differ from traditional virtual machines.
 
@@ -173,7 +173,7 @@ Current monitors include:
 * Proxmox Host
 * Router
 
-![Uptime Kuma Dashboard](images/uptime-kuma-dashboard.png)
+![Uptime Kuma Dashboard](images/proxmox/uptime-kuma-dashboard.png)
 
 This provides immediate visibility into the health and availability of key devices within the homelab.
 
@@ -181,7 +181,7 @@ This provides immediate visibility into the health and availability of key devic
 
 ## Current Architecture
 
-![Homelab Architecture](images/network-diagram-homelab-overview.png)
+![Homelab Architecture](images/proxmox/network-diagram-homelab-overview.png)
 
 ---
 
