@@ -1,0 +1,570 @@
+# Proxmox Wazuh SIEM Homelab
+
+## Overview
+
+This project documents the deployment of a self-hosted **Wazuh SIEM/XDR lab** inside my Proxmox homelab.
+
+The goal of this project was to build a practical cybersecurity monitoring environment that can collect endpoint logs, detect security-relevant activity, and provide hands-on experience with SOC-style investigation workflows.
+
+Wazuh was deployed on a dedicated Ubuntu Server VM, and a Wazuh agent was installed on an existing Ubuntu LXC running Grafana, Prometheus, Node Exporter, and Uptime Kuma.
+
+---
+
+## Lab Architecture
+
+```text
+Dell OptiPlex 7070 SFF
+├── Proxmox VE
+│
+├── Ubuntu LXC
+│   ├── Grafana
+│   ├── Prometheus
+│   ├── Node Exporter
+│   ├── Uptime Kuma
+│   └── Wazuh Agent
+│
+└── Ubuntu VM
+    └── Wazuh SIEM
+        ├── Wazuh Manager
+        ├── Wazuh Indexer
+        └── Wazuh Dashboard
+```
+
+---
+
+## Hardware Used
+
+```text
+Host: Dell OptiPlex 7070 SFF
+CPU: Intel Core i7 9th Gen
+RAM: 16GB DDR4
+Storage: 512GB SSD
+Hypervisor: Proxmox VE
+```
+
+---
+
+## Wazuh VM Configuration
+
+```text
+VM Name: wazuh-siem
+Operating System: Ubuntu Server 24.04 LTS
+CPU: 4 cores
+Memory: 6GB RAM
+Disk: 80GB
+Network: VirtIO bridged adapter
+IP Address: 192.168.1.25
+```
+
+The Wazuh server was deployed as a single-node installation. This includes:
+
+```text
+Wazuh Manager
+Wazuh Indexer
+Wazuh Dashboard
+```
+
+The dashboard was accessed through:
+
+```text
+https://192.168.1.25
+```
+
+---
+
+## Monitored Endpoint
+
+The first monitored endpoint was my existing Ubuntu LXC running monitoring tools.
+
+```text
+Endpoint Name: grafana-prometheus
+Operating System: Ubuntu 24.04.4 LTS
+IP Address: 192.168.1.22
+Wazuh Agent Version: 4.14.5
+```
+
+Services running on the endpoint:
+
+```text
+Grafana
+Prometheus
+Node Exporter
+Uptime Kuma
+Docker
+```
+
+---
+
+## Screenshots
+
+### 1. Proxmox Wazuh VM Hardware Configuration
+
+Use the screenshot showing the Wazuh VM hardware settings:
+
+```text
+Memory: 6.00 GiB
+Processors: 4 cores
+BIOS: OVMF
+Machine: q35
+Disk: 80GB
+Network: vmbr0
+```
+
+Suggested file name:
+
+```text
+images/01-proxmox-wazuh-vm-hardware.png
+```
+
+---
+
+### 2. Wazuh Dashboard Overview
+
+Use the screenshot showing the main Wazuh dashboard with sections such as:
+
+```text
+Configuration Assessment
+Malware Detection
+File Integrity Monitoring
+Threat Hunting
+Vulnerability Detection
+MITRE ATT&CK
+```
+
+Suggested file name:
+
+```text
+images/02-wazuh-dashboard-overview.png
+```
+
+---
+
+### 3. Wazuh Agent Connected
+
+Use the screenshot showing the active endpoint:
+
+```text
+Agent: grafana-prometheus
+IP Address: 192.168.1.22
+Operating System: Ubuntu 24.04.4 LTS
+Status: Active
+Version: v4.14.5
+```
+
+Suggested file name:
+
+```text
+images/03-wazuh-agent-connected.png
+```
+
+---
+
+### 4. User Creation Detection
+
+Use the screenshot showing these alerts:
+
+```text
+New group added to the system
+New user added to the system
+First time user executed sudo
+```
+
+Suggested file name:
+
+```text
+images/04-user-creation-alerts.png
+```
+
+---
+
+### 5. User Deletion Detection
+
+Use the screenshot showing:
+
+```text
+Group (or user) deleted from the system
+Rule ID: 5903
+```
+
+Suggested file name:
+
+```text
+images/05-user-deletion-alert.png
+```
+
+---
+
+### 6. Package Installation Detection
+
+Use the screenshot showing the `nmap` package installation alerts:
+
+```text
+New dpkg requested to install
+New dpkg installed
+Dpkg half configured
+```
+
+Suggested file name:
+
+```text
+images/06-nmap-package-install-alerts.png
+```
+
+---
+
+### 7. Docker Listener Enabled
+
+Use the terminal screenshot showing:
+
+```text
+Module docker-listener started.
+Starting to listening Docker events.
+docker ps
+grafana
+prometheus
+node-exporter
+uptime-kuma
+```
+
+Suggested file name:
+
+```text
+images/07-docker-listener-enabled.png
+```
+
+---
+
+## Installation Summary
+
+### 1. Created a Dedicated Wazuh VM
+
+A new Ubuntu Server VM was created in Proxmox with:
+
+```text
+4 CPU cores
+6GB RAM
+80GB disk
+VirtIO network adapter
+Ubuntu Server 24.04 LTS
+```
+
+---
+
+### 2. Installed Wazuh
+
+Wazuh was installed using the official all-in-one deployment method.
+
+```bash
+curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh
+sudo bash wazuh-install.sh -a
+```
+
+After installation, the Wazuh dashboard became accessible at:
+
+```text
+https://192.168.1.25
+```
+
+---
+
+### 3. Deployed a Wazuh Agent
+
+A Wazuh agent was installed on the Ubuntu LXC running Grafana and Prometheus.
+
+The agent was deployed from the Wazuh dashboard using:
+
+```text
+Deploy new agent
+Linux
+DEB amd64
+Server address: 192.168.1.25
+Agent name: grafana-prometheus
+```
+
+After installation, the agent appeared as active in the Wazuh dashboard.
+
+---
+
+## Security Event Testing
+
+### User Creation Test
+
+A test Linux user was created on the monitored Ubuntu LXC.
+
+```bash
+useradd hacker
+```
+
+Wazuh generated alerts for:
+
+```text
+New group added to the system
+New user added to the system
+First time user executed sudo
+```
+
+Observed rule IDs:
+
+```text
+5901 - New group added to the system
+5902 - New user added to the system
+5403 - First time user executed sudo
+```
+
+---
+
+### User Deletion Test
+
+The test user was deleted.
+
+```bash
+userdel hacker
+```
+
+Wazuh generated the following alert:
+
+```text
+Group (or user) deleted from the system
+```
+
+Observed rule ID:
+
+```text
+5903
+```
+
+---
+
+### Package Installation Test
+
+`nmap` was installed on the monitored Ubuntu LXC.
+
+```bash
+apt install nmap -y
+```
+
+Wazuh detected Debian package activity:
+
+```text
+New dpkg requested to install
+New dpkg installed
+Dpkg half configured
+```
+
+Observed rule IDs:
+
+```text
+2901 - New dpkg requested to install
+2902 - New dpkg installed
+2904 - Dpkg half configured
+```
+
+---
+
+## Docker Monitoring Configuration
+
+The monitored Ubuntu LXC was running Docker containers for:
+
+```text
+Grafana
+Prometheus
+Node Exporter
+Uptime Kuma
+```
+
+The Docker listener was enabled in the Wazuh agent configuration file:
+
+```bash
+/var/ossec/etc/ossec.conf
+```
+
+The following block was added before the closing `</ossec_config>` tag:
+
+```xml
+<wodle name="docker-listener">
+  <disabled>no</disabled>
+  <interval>10m</interval>
+  <attempts>5</attempts>
+  <run_on_start>yes</run_on_start>
+</wodle>
+```
+
+The Wazuh agent was then restarted:
+
+```bash
+systemctl restart wazuh-agent
+```
+
+The Wazuh agent logs confirmed that the Docker listener started successfully:
+
+```text
+Module docker-listener started.
+Starting to listening Docker events.
+```
+
+Docker event visibility in the Wazuh dashboard still requires further testing and validation.
+
+---
+
+## Detection Results
+
+| Activity                          | Result                   |
+| --------------------------------- | ------------------------ |
+| Wazuh dashboard deployed          | Successful               |
+| Linux endpoint connected          | Successful               |
+| User creation detected            | Successful               |
+| Group creation detected           | Successful               |
+| User deletion detected            | Successful               |
+| Sudo activity detected            | Successful               |
+| Package installation detected     | Successful               |
+| Wazuh agent restart detected      | Successful               |
+| Docker listener enabled           | Successful               |
+| Docker dashboard event visibility | Further testing required |
+
+---
+
+## Challenges Faced
+
+### Prometheus Was Running in Docker
+
+Initially, I attempted to restart Prometheus using:
+
+```bash
+systemctl restart prometheus
+```
+
+This failed because Prometheus was not installed as a native Linux service. It was running inside Docker.
+
+The correct command was:
+
+```bash
+docker restart prometheus
+```
+
+This helped reinforce the difference between:
+
+```text
+systemd services
+Docker containers
+SIEM log visibility
+```
+
+---
+
+### Docker Events Required Additional Configuration
+
+Wazuh detected Linux system activity immediately, such as user creation, package installation, and sudo activity.
+
+Docker activity required the Docker listener to be enabled manually in the Wazuh agent configuration.
+
+The listener successfully started, but Docker event visibility in the dashboard still needs further testing.
+
+---
+
+## Skills Demonstrated
+
+```text
+Proxmox virtualization
+Ubuntu Server administration
+Linux endpoint monitoring
+Wazuh SIEM deployment
+Wazuh agent deployment
+Security event detection
+Linux log analysis
+Package monitoring
+Docker monitoring basics
+SOC-style investigation
+Troubleshooting
+```
+
+---
+
+## Key Lessons Learned
+
+This project helped me understand how endpoint activity flows into a SIEM.
+
+Key lessons included:
+
+```text
+How to deploy Wazuh inside Proxmox
+How to install and configure a Wazuh agent
+How Linux account changes appear in a SIEM
+How package installations are detected through dpkg logs
+How Wazuh rules classify events by severity
+How Docker differs from systemd-managed services
+Why endpoint visibility is important for security monitoring
+```
+
+---
+
+## Future Improvements
+
+Planned next steps:
+
+```text
+1. Add a Windows 11 VM as a Wazuh endpoint
+2. Install Sysmon on the Windows endpoint
+3. Forward Sysmon logs into Wazuh
+4. Build Windows attack simulation detections
+5. Add a Windows Server VM
+6. Configure Active Directory
+7. Monitor authentication events and privilege changes
+8. Add the Proxmox host as a monitored endpoint
+9. Build custom Wazuh dashboards
+10. Document detection use cases with screenshots
+```
+
+The next major improvement will be adding a Windows endpoint with Sysmon. This will provide richer security telemetry such as:
+
+```text
+Process creation
+PowerShell execution
+Network connections
+Registry changes
+Authentication events
+Suspicious command-line activity
+```
+
+---
+
+## Project Summary
+
+This project successfully deployed a working Wazuh SIEM lab inside Proxmox and connected a Linux endpoint for monitoring.
+
+The lab successfully detected:
+
+```text
+User creation
+User deletion
+Group creation
+Package installation
+Sudo activity
+Wazuh agent lifecycle events
+```
+
+This project provides a strong foundation for future cybersecurity homelab work, including Windows monitoring, Sysmon telemetry, Active Directory security monitoring, and SOC-style detection engineering.
+
+---
+
+## Repository Name Suggestion
+
+```text
+proxmox-wazuh-siem-lab
+```
+
+---
+
+## Repository Description
+
+```text
+A Proxmox-based cybersecurity homelab using Wazuh SIEM to monitor Linux endpoints, detect account changes, package installations, and security events.
+```
+
+---
+
+## References
+
+* Wazuh Documentation: https://documentation.wazuh.com/
+* Wazuh Docker Monitoring: https://documentation.wazuh.com/current/user-manual/capabilities/container-security/monitoring-docker.html
+* Ubuntu Server: https://ubuntu.com/server
+* Proxmox VE: https://www.proxmox.com/en/products/proxmox-virtual-environment/overview
