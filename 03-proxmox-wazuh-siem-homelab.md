@@ -23,23 +23,7 @@ The Wazuh lab consists of:
 * Ubuntu 24.04 LXC monitored with a Wazuh Agent
 * Docker services running Grafana, Prometheus, Node Exporter and Uptime Kuma
 
-```text
-Dell OptiPlex 7070 SFF
-└── Proxmox VE
-    ├── Ubuntu 24.04 VM
-    │   └── Wazuh SIEM
-    │       ├── Wazuh Manager
-    │       ├── Wazuh Indexer
-    │       └── Wazuh Dashboard
-    │
-    └── Ubuntu 24.04 LXC
-        ├── Docker
-        ├── Grafana
-        ├── Prometheus
-        ├── Node Exporter
-        ├── Uptime Kuma
-        └── Wazuh Agent
-```
+![Architecture Diagram](images/wazuh/network-diagram-wazuh.png)
 
 ---
 
@@ -323,28 +307,6 @@ Another challenge was Docker monitoring.
 Wazuh successfully loaded the Docker listener, but Docker events did not immediately appear in the dashboard when searching for terms such as `docker` or `container`.
 
 This showed that enabling a module and validating the visibility of events are separate steps.
-
----
-
-## Current Security Monitoring Stack
-
-```text
-Dell OptiPlex 7070 SFF
-└── Proxmox VE
-    ├── Ubuntu Server 24.04 VM
-    │   └── Wazuh SIEM
-    │       ├── Wazuh Manager
-    │       ├── Wazuh Indexer
-    │       └── Wazuh Dashboard
-    │
-    └── Ubuntu 24.04 LXC
-        ├── Docker
-        ├── Grafana
-        ├── Prometheus
-        ├── Node Exporter
-        ├── Uptime Kuma
-        └── Wazuh Agent
-```
 
 ---
 
